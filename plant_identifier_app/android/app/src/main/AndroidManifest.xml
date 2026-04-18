@@ -1,0 +1,6 @@
+manifest {
+    package = "com.example.plant_identifier"
+}
+
+dependencies {
+}
