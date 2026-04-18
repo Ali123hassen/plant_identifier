@@ -66,7 +66,18 @@ class PlantService extends ChangeNotifier {
         return null;
       }
     } catch (e) {
-      _error = 'خطأ في الاتصال بالخادم: $e';
+      String errorMsg = 'خطأ في الاتصال بالخادم: $e';
+      
+      // Check for specific errors and provide helpful messages
+      if (e.toString().contains('Connection timed out')) {
+        errorMsg = 'لا يمكن الوصول للخادم! تأكد من:\n1. تشغيل Laravel على الخادم\n2. أن الهاتف على نفس WiFi\n3. جدار الحماية مسموح';
+      } else if (e.toString().contains('Connection refused')) {
+        errorMsg = 'الاتصال مرفوض! تأكد من تشغيل Laravel';
+      } else if (e.toString().contains('name or service not known')) {
+        errorMsg = 'عنوان الخادم غير صحيح!';
+      }
+      
+      _error = errorMsg;
       debugPrint('====== API ERROR ======');
       debugPrint('URL: $baseUrl/identify');
       debugPrint('Error: $e');
