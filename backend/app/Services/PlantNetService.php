@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class PlantNetService
 {
@@ -21,15 +22,28 @@ class PlantNetService
     public function identifyPlant($imagePath): array
     {
         try {
-            $response = Http::timeout(60)
-                ->attach('images', file_get_contents($imagePath), 'image.jpg')
-                ->post("{$this->apiKey}/v2/identify/all?api-key={$this->apiKey}&lang=ar");
+            $client = new Client(['timeout' => 60]);
+            
+            $response = $client->post($this->baseUrl, [
+                'multipart' => [
+                    [
+                        'name' => 'images',
+                        'contents' => fopen($imagePath, 'r'),
+                        'filename' => 'image.jpg',
+                    ],
+                ],
+                'query' => [
+                    'api-key' => $this->apiKey,
+                    'lang' => 'ar',
+                ],
+            ]);
 
-            if ($response->successful()) {
-                return $this->parsePlantResponse($response->json());
+            if ($response->getStatusCode() === 200) {
+                $data = json_decode($response->getBody()->getContents(), true);
+                return $this->parsePlantResponse($data);
             }
 
-            Log::error('PlantNet API Error', ['response' => $response->body()]);
+            Log::error('PlantNet API Error', ['response' => $response->getBody()]);
             return $this->getFallbackIdentification($imagePath);
         } catch (\Exception $e) {
             Log::error('PlantNet Service Error', ['error' => $e->getMessage()]);
