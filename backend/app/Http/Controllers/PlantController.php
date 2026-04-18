@@ -6,7 +6,6 @@ use App\Services\PlantNetService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controller;
 
 class PlantController extends Controller
@@ -19,25 +18,35 @@ class PlantController extends Controller
     }
 
     /**
-     * التعرف على نبات من صورة
+     *认识 نبات من صورة
      */
     public function identify(Request $request): JsonResponse
     {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:5120',
-        ]);
-
         try {
+            if (!$request->hasFile('image')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لم يتم إرسال صورة',
+                ], 400);
+            }
+
             $image = $request->file('image');
-            $path = $image->store('temp', 'public');
+            
+            // Save to temp file
+            $tempPath = tempnam(sys_get_temp_dir(), 'plant_') . '.jpg';
+            file_put_contents($tempPath, $image->getContent());
 
-            $result = $this->plantNetService->identifyPlant(storage_path("app/public/{$path}"));
-
-            Storage::disk('public')->delete($path);
+            $result = $this->plantNetService->identifyPlant($tempPath);
+            
+            // Clean up temp file
+            @unlink($tempPath);
 
             return response()->json($result);
         } catch (\Exception $e) {
-            Log::error('Plant Identification Error', ['error' => $e->getMessage()]);
+            Log::error('Plant Identification Error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'حدث خطأ في التعرف على النبات',
