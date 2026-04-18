@@ -40,6 +40,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         App\Providers\AppServiceProvider::class,
+        App\Providers\RouteServiceProvider::class,
         App\Providers\PlantServiceProvider::class,
     ],
     'aliases' => Facade::defaultAliases()->toArray(),
