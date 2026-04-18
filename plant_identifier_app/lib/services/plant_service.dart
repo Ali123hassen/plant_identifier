@@ -67,7 +67,10 @@ class PlantService extends ChangeNotifier {
       }
     } catch (e) {
       _error = 'خطأ في الاتصال بالخادم: $e';
-      debugPrint('API Error: $e');
+      debugPrint('====== API ERROR ======');
+      debugPrint('URL: $baseUrl/identify');
+      debugPrint('Error: $e');
+      debugPrint('=====================');
       return null;
     } finally {
       _isLoading = false;
