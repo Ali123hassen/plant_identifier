@@ -21,19 +21,28 @@ class PlantNetService
      */
     public function identifyPlant($imagePath): array
     {
+        $apiKey = config('services.plantnet.api_key', env('PLANTNET_API_KEY', ''));
+        
+        // Check if API key is configured, otherwise use fallback
+        if (empty($apiKey) || $apiKey === 'your_plantnet_api_key_here') {
+            Log::info('PlantNet API key not configured, using fallback identification');
+            return $this->getFallbackIdentification($imagePath);
+        }
+        
         try {
             $client = new Client(['timeout' => 60]);
             
-            $response = $client->post($this->baseUrl, [
+            // Use correct PlantNet API endpoint
+            $response = $client->post($this->baseUrl . '/v2/identify/all', [
                 'multipart' => [
                     [
                         'name' => 'images',
                         'contents' => fopen($imagePath, 'r'),
-                        'filename' => 'image.jpg',
+                        'filename' => basename($imagePath),
                     ],
                 ],
                 'query' => [
-                    'api-key' => $this->apiKey,
+                    'api-key' => $apiKey,
                     'lang' => 'ar',
                 ],
             ]);
@@ -43,7 +52,7 @@ class PlantNetService
                 return $this->parsePlantResponse($data);
             }
 
-            Log::error('PlantNet API Error', ['response' => $response->getBody()]);
+            Log::error('PlantNet API Error', ['status' => $response->getStatusCode(), 'response' => $response->getBody()]);
             return $this->getFallbackIdentification($imagePath);
         } catch (\Exception $e) {
             Log::error('PlantNet Service Error', ['error' => $e->getMessage()]);
