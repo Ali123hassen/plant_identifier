@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PlantController;
+use App\Http\Controllers\API\PlantController;
 
 /*
 |--------------------------------------------------------------------------

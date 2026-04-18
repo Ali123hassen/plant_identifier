@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Controller;
 
 class PlantController extends Controller
 {
@@ -27,14 +28,11 @@ class PlantController extends Controller
         ]);
 
         try {
-            // حفظ الصورة مؤقتاً
             $image = $request->file('image');
             $path = $image->store('temp', 'public');
 
-            // التعرف على النبات
             $result = $this->plantNetService->identifyPlant(storage_path("app/public/{$path}"));
 
-            // حذف الصورة المؤقتة
             Storage::disk('public')->delete($path);
 
             return response()->json($result);
@@ -59,7 +57,6 @@ class PlantController extends Controller
 
         try {
             $base64Image = $request->input('image');
-            // Remove data URL prefix if present
             $base64Image = preg_replace('/^data:image\/\w+;base64,/', '', $base64Image);
 
             $result = $this->plantNetService->identifyPlantFromBase64($base64Image);
@@ -80,7 +77,6 @@ class PlantController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        // يمكن إضافة قاعدة بيانات للنباتات
         return response()->json([
             'success' => true,
             'message' => 'معلومات النبات',
@@ -107,7 +103,6 @@ class PlantController extends Controller
             'confidence' => 'required|numeric',
         ]);
 
-        // هنا يمكن حفظ نتيجة النبات في قاعدة البيانات
         return response()->json([
             'success' => true,
             'message' => 'تم حفظ نتيجة النبات بنجاح',
