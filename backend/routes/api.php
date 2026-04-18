@@ -10,6 +10,16 @@ use App\Http\Controllers\PlantController;
 */
 
 Route::prefix('v1')->group(function () {
+    // CORS middleware for API
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization, X-Requested-With');
+    
+    // Handle preflight requests
+    Route::options('/{any}', function() {
+        return response()->json([], 200);
+    })->where('any', '.*');
+    
     // التعرف على النبات
     Route::post('/identify', [PlantController::class, 'identify']);
     Route::post('/identify/base64', [PlantController::class, 'identifyBase64']);
