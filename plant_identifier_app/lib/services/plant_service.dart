@@ -7,11 +7,15 @@ import '../models/plant_model.dart';
 
 class PlantService extends ChangeNotifier {
   // For real Android device connected to same WiFi, use your PC's IP address
-  // Run 'ipconfig' on Windows to get your IP (e.g., 192.168.1.35)
+  // Run 'ipconfig' on Windows to get your IP
+  // Try both 192.168.1.35 and 192.168.1.x 
   static const String baseUrl = 'http://192.168.1.35:8000/api/v1';
   // static const String baseUrl = 'http://10.0.2.2:8000/api/v1'; // Android emulator
   // static const String baseUrl = 'http://localhost:8000/api/v1'; // iOS simulator
   // static const String baseUrl = 'https://your-server.com/api/v1'; // Production
+  
+  // Create client with timeout
+  http.Client get _client => http.Client();
 
   bool _isLoading = false;
   String? _error;
@@ -70,7 +74,7 @@ class PlantService extends ChangeNotifier {
       
       // Check for specific errors and provide helpful messages
       if (e.toString().contains('Connection timed out')) {
-        errorMsg = 'لا يمكن الوصول للخادم! تأكد من:\n1. تشغيل Laravel على الخادم\n2. أن الهاتف على نفس WiFi\n3. جدار الحماية مسموح';
+        errorMsg = 'لا يمكن الوصول للخادم!\n\nتأكد من:\n1. WiFi متصل نفس الشبكة\n2. تشغيل Laravel\n3. جرب فتح الرابط في المتصفح';
       } else if (e.toString().contains('Connection refused')) {
         errorMsg = 'الاتصال مرفوض! تأكد من تشغيل Laravel';
       } else if (e.toString().contains('name or service not known')) {
@@ -80,6 +84,7 @@ class PlantService extends ChangeNotifier {
       _error = errorMsg;
       debugPrint('====== API ERROR ======');
       debugPrint('URL: $baseUrl/identify');
+      debugPrint('Error Type: ${e.runtimeType}');
       debugPrint('Error: $e');
       debugPrint('=====================');
       return null;
