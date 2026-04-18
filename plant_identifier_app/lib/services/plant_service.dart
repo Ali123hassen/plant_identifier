@@ -32,6 +32,8 @@ class PlantService extends ChangeNotifier {
     notifyListeners();
 
     try {
+      debugPrint('Sending request to: $baseUrl/identify');
+      
       final request = http.MultipartRequest(
         'POST',
         Uri.parse('$baseUrl/identify'),
@@ -42,7 +44,10 @@ class PlantService extends ChangeNotifier {
       );
 
       final streamedResponse = await request.send();
+      debugPrint('Response status: ${streamedResponse.statusCode}');
+      
       final response = await http.Response.fromStream(streamedResponse);
+      debugPrint('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -57,11 +62,12 @@ class PlantService extends ChangeNotifier {
           return null;
         }
       } else {
-        _error = 'خطأ في الاتصال بالخادم';
+        _error = 'خطأ في الاتصال بالخادم: Status ${response.statusCode}';
         return null;
       }
     } catch (e) {
-      _error = 'خطأ: $e';
+      _error = 'خطأ في الاتصال بالخادم: $e';
+      debugPrint('API Error: $e');
       return null;
     } finally {
       _isLoading = false;
