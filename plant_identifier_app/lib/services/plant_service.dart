@@ -6,7 +6,10 @@ import 'package:image_picker/image_picker.dart';
 import '../models/plant_model.dart';
 
 class PlantService extends ChangeNotifier {
-  static const String baseUrl = 'http://10.0.2.2:8000/api/v1'; // Android emulator
+  // For real Android device connected to same WiFi, use your PC's IP address
+  // Run 'ipconfig' on Windows to get your IP (e.g., 192.168.1.35)
+  static const String baseUrl = 'http://192.168.1.35:8000/api/v1';
+  // static const String baseUrl = 'http://10.0.2.2:8000/api/v1'; // Android emulator
   // static const String baseUrl = 'http://localhost:8000/api/v1'; // iOS simulator
   // static const String baseUrl = 'https://your-server.com/api/v1'; // Production
 
