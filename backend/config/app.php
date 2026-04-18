@@ -19,6 +19,7 @@ return [
     ],
     'providers' => ServiceProvider::defaultProviders()->merge([
         App\Providers\AppServiceProvider::class,
+        App\Providers\PlantServiceProvider::class,
     ])->toArray(),
     'aliases' => Facade::defaultAliases()->merge([])->toArray(),
 ];
