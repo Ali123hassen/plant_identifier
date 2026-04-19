@@ -29,24 +29,24 @@ class PlantModel {
 
   factory PlantModel.fromJson(Map<String, dynamic> json) {
     // Helper to convert any type to String
-    String _toString(dynamic value) {
+    String toStr(dynamic value) {
       if (value == null) return '';
       if (value is String) return value;
-      if (value is Map) return json.encode(value);
+      if (value is Map || value is List) return value.toString();
       return value.toString();
     }
     
     return PlantModel(
-      scientificName: _toString(json['scientific_name']),
-      commonName: _toString(json['common_name']) ?? 'غير معروف',
-      family: _toString(json['family']),
-      genus: _toString(json['genus']),
+      scientificName: toStr(json['scientific_name']),
+      commonName: toStr(json['common_name']).isNotEmpty ? toStr(json['common_name']) : 'غير معروف',
+      family: toStr(json['family']),
+      genus: toStr(json['genus']),
       confidence: (json['confidence'] ?? 0).toDouble(),
       needsWater: json['needs_water'] ?? true,
       needsFertilizer: json['needs_fertilizer'] ?? true,
       needsSunlight: json['needs_sunlight'] ?? true,
-      careInstructions: _toString(json['care_instructions']),
-      description: _toString(json['description']),
+      careInstructions: toStr(json['care_instructions']),
+      description: toStr(json['description']),
       identifiedAt: DateTime.now(),
     );
   }
