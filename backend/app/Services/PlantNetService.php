@@ -32,7 +32,10 @@ class PlantNetService
         }
         
         try {
-            $client = new Client(['timeout' => 60]);
+            $client = new Client([
+                'timeout' => 60,
+                'verify' => false, // Disable SSL verification for Windows
+            ]);
             
             Log::info('Calling PlantNet API', ['image' => $imagePath, 'key_prefix' => substr($apiKey, 0, 5)]);
             
