@@ -23,14 +23,18 @@ class PlantNetService
     {
         $apiKey = config('services.plantnet.api_key', env('PLANTNET_API_KEY', ''));
         
+        Log::info('PlantNet API Key loaded', ['key' => substr($apiKey, 0, 5) . '...']);
+        
         // Check if API key is configured, otherwise use fallback
         if (empty($apiKey) || $apiKey === 'your_plantnet_api_key_here') {
-            Log::info('PlantNet API key not configured, using fallback identification');
+            Log::info('PlantNet API key not configured or invalid, using fallback identification');
             return $this->getFallbackIdentification($imagePath);
         }
         
         try {
             $client = new Client(['timeout' => 60]);
+            
+            Log::info('Calling PlantNet API', ['image' => $imagePath, 'key_prefix' => substr($apiKey, 0, 5)]);
             
             // Use correct PlantNet API endpoint
             $response = $client->post($this->baseUrl . '/v2/identify/all', [
@@ -46,6 +50,8 @@ class PlantNetService
                     'lang' => 'ar',
                 ],
             ]);
+
+            Log::info('PlantNet response status', ['status' => $response->getStatusCode()]);
 
             if ($response->getStatusCode() === 200) {
                 $data = json_decode($response->getBody()->getContents(), true);
