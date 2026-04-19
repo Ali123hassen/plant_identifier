@@ -64,7 +64,10 @@ class PlantNetService
             Log::error('PlantNet API Error', ['status' => $response->getStatusCode(), 'response' => $response->getBody()]);
             return $this->getFallbackIdentification($imagePath);
         } catch (\Exception $e) {
-            Log::error('PlantNet Service Error', ['error' => $e->getMessage()]);
+            Log::error('PlantNet Service Error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return $this->getFallbackIdentification($imagePath);
         }
     }
