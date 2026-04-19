@@ -58,6 +58,9 @@ class PlantNetService
 
             if ($response->getStatusCode() === 200) {
                 $data = json_decode($response->getBody()->getContents(), true);
+                
+                Log::info('PlantNet API Response', ['data' => json_encode($data)]);
+                
                 return $this->parsePlantResponse($data);
             }
 
@@ -175,7 +178,13 @@ class PlantNetService
     private function getDescription(array $species): string
     {
         $name = $this->getCommonName($species);
+        
+        // Handle family as it might be an array
         $family = $species['family'] ?? 'غير معروفة';
+        if (is_array($family)) {
+            $family = $family['scientificName'] ?? $family['name'] ?? 'غير معروفة';
+        }
+        
         return "نبات " . $name . " من فصيلة " . $family;
     }
 
