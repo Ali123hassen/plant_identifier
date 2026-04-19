@@ -163,7 +163,8 @@ class PlantNetService
     private function getDescription(array $species): string
     {
         $name = $this->getCommonName($species);
-        return "نبات {$name} من فصيلة {$species['family'] ?? 'غير معروفة'}";
+        $family = $species['family'] ?? 'غير معروفة';
+        return "نبات " . $name . " من فصيلة " . $family;
     }
 
     /**
